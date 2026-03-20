@@ -7,12 +7,26 @@ import { Users, Bot, MessageSquare, Plus, Smartphone, Megaphone, Target } from "
 export default async function DashboardPage() {
   const supabase = await createClient()
 
-  const { count: contactsCount } = await supabase.from('contacts').select('*', { count: 'exact', head: true })
-  const { count: activeLeadsCount } = await supabase.from('leads').select('*', { count: 'exact', head: true }).eq('status', 'open')
-  const { count: openConversationsCount } = await supabase.from('conversations').select('*', { count: 'exact', head: true }).eq('status', 'open')
-  const { count: activeAgentsCount } = await supabase.from('agents').select('*', { count: 'exact', head: true }).eq('is_active', true)
-  const { count: whatsappAccountsCount } = await supabase.from('whatsapp_accounts').select('*', { count: 'exact', head: true })
-  const { count: campaignsCount } = await supabase.from('campaigns').select('*', { count: 'exact', head: true })
+  const getCount = async (query: any) => {
+    try {
+      const { count, error } = await query
+      if (error) {
+        console.error("Dashboard count error:", error)
+        return 0
+      }
+      return count || 0
+    } catch (err) {
+      console.error("Dashboard query exception:", err)
+      return 0
+    }
+  }
+
+  const contactsCount = await getCount(supabase.from('contacts').select('*', { count: 'exact', head: true }))
+  const activeLeadsCount = await getCount(supabase.from('leads').select('*', { count: 'exact', head: true }).eq('status', 'open'))
+  const openConversationsCount = await getCount(supabase.from('conversations').select('*', { count: 'exact', head: true }).eq('status', 'open'))
+  const activeAgentsCount = await getCount(supabase.from('agents').select('*', { count: 'exact', head: true }).eq('is_active', true))
+  const whatsappAccountsCount = await getCount(supabase.from('whatsapp_accounts').select('*', { count: 'exact', head: true }))
+  const campaignsCount = await getCount(supabase.from('campaigns').select('*', { count: 'exact', head: true }))
 
   return (
     <div className="space-y-6">
