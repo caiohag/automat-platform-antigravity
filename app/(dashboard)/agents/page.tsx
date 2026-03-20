@@ -44,8 +44,8 @@ export default async function AgentsPage() {
                   <div className="p-2 bg-secondary rounded-md">
                     <Bot className="w-5 h-5 text-secondary-foreground" />
                   </div>
-                  <Badge variant={agent.status === 'active' ? 'default' : 'secondary'}>
-                    {agent.status === 'active' ? 'Ativo' : 'Inativo'}
+                  <Badge variant={agent.is_active ? 'default' : 'secondary'}>
+                    {agent.is_active ? 'Ativo' : 'Inativo'}
                   </Badge>
                 </div>
                 <CardTitle className="text-xl">{agent.name}</CardTitle>

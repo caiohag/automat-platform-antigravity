@@ -38,17 +38,17 @@ export default function RegisterPage() {
         return
       }
       
-      // Auto create organization
+      // Auto create tenant
       if (data.user) {
+        const slug = name.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + Math.floor(Math.random() * 1000)
         const { error: orgError } = await supabase
-          .from('organizations')
+          .from('tenants')
           .insert([
-            { name: `Organização de ${name}`, owner_id: data.user.id }
+            { name: `Conta de ${name}`, slug, owner_id: data.user.id }
           ])
           
         if (orgError) {
-          console.error("Erro ao criar organização:", orgError)
-          // Ignorando erro de RLS temporariamente para o usuário seguir
+          console.error("Erro ao criar tenant:", orgError)
         }
       }
 

@@ -2,15 +2,17 @@ import { createClient } from "@/lib/supabase/server"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button, buttonVariants } from "@/components/ui/button"
 import Link from "next/link"
-import { Users, Bot, MessageSquare, Send, Plus } from "lucide-react"
+import { Users, Bot, MessageSquare, Plus, Smartphone, Megaphone, Target } from "lucide-react"
 
 export default async function DashboardPage() {
   const supabase = await createClient()
 
   const { count: contactsCount } = await supabase.from('contacts').select('*', { count: 'exact', head: true })
-  const { count: activeAgentsCount } = await supabase.from('agents').select('*', { count: 'exact', head: true }).eq('status', 'active')
+  const { count: activeLeadsCount } = await supabase.from('leads').select('*', { count: 'exact', head: true }).eq('status', 'open')
   const { count: openConversationsCount } = await supabase.from('conversations').select('*', { count: 'exact', head: true }).eq('status', 'open')
-  const { count: messagesSentCount } = await supabase.from('messages').select('*', { count: 'exact', head: true }).eq('direction', 'outbound')
+  const { count: activeAgentsCount } = await supabase.from('agents').select('*', { count: 'exact', head: true }).eq('is_active', true)
+  const { count: whatsappAccountsCount } = await supabase.from('whatsapp_accounts').select('*', { count: 'exact', head: true })
+  const { count: campaignsCount } = await supabase.from('campaigns').select('*', { count: 'exact', head: true })
 
   return (
     <div className="space-y-6">
@@ -19,7 +21,7 @@ export default async function DashboardPage() {
         <p className="text-muted-foreground">Acompanhe as métricas da sua operação.</p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium">Total de Contatos</CardTitle>
@@ -31,11 +33,11 @@ export default async function DashboardPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium">Agentes Ativos</CardTitle>
-            <Bot className="w-4 h-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Leads Ativos</CardTitle>
+            <Target className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{activeAgentsCount || 0}</div>
+            <div className="text-2xl font-bold">{activeLeadsCount || 0}</div>
           </CardContent>
         </Card>
         <Card>
@@ -49,11 +51,29 @@ export default async function DashboardPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium">Mensagens Enviadas</CardTitle>
-            <Send className="w-4 h-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Agentes Ativos</CardTitle>
+            <Bot className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{messagesSentCount || 0}</div>
+            <div className="text-2xl font-bold">{activeAgentsCount || 0}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-sm font-medium">Contas WhatsApp</CardTitle>
+            <Smartphone className="w-4 h-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{whatsappAccountsCount || 0}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-sm font-medium">Campanhas</CardTitle>
+            <Megaphone className="w-4 h-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{campaignsCount || 0}</div>
           </CardContent>
         </Card>
       </div>

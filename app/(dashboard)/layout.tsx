@@ -20,6 +20,14 @@ import {
   Menu,
   ChevronLeft,
   ChevronRight,
+  Building,
+  ListTodo,
+  CheckSquare,
+  RotateCcw,
+  Users,
+  CreditCard,
+  Palette,
+  HelpCircle,
 } from "lucide-react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -41,14 +49,19 @@ interface NavGroup {
 const navGroups: NavGroup[] = [
   {
     label: "Visão Geral",
-    items: [{ name: "Dashboard", href: "/dashboard", icon: LayoutDashboard }],
+    items: [
+      { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+      { name: "Contas", href: "/accounts", icon: Building },
+    ],
   },
   {
     label: "Atendimento",
     items: [
       { name: "Chat", href: "/chat", icon: MessageCircle },
+      { name: "Pipeline", href: "/pipeline", icon: ListTodo },
       { name: "Kanban", href: "/kanban", icon: Kanban },
       { name: "Contatos", href: "/contacts", icon: Contact },
+      { name: "Tarefas", href: "/tasks", icon: CheckSquare },
     ],
   },
   {
@@ -63,12 +76,19 @@ const navGroups: NavGroup[] = [
     label: "Marketing",
     items: [
       { name: "Campanhas", href: "/campaigns", icon: Megaphone },
+      { name: "Remarketing", href: "/remarketing", icon: RotateCcw },
       { name: "Templates", href: "/templates", icon: Tag },
     ],
   },
   {
-    label: "Configurações",
-    items: [{ name: "Configurações", href: "/settings", icon: Settings }],
+    label: "Gestão",
+    items: [
+      { name: "Equipe", href: "/team", icon: Users },
+      { name: "Assinatura", href: "/subscription", icon: CreditCard },
+      { name: "White-Label", href: "/white-label", icon: Palette },
+      { name: "Configurações", href: "/settings", icon: Settings },
+      { name: "Central de Ajuda", href: "/help", icon: HelpCircle },
+    ],
   },
 ]
 
