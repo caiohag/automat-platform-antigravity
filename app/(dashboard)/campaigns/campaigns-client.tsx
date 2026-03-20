@@ -96,12 +96,12 @@ export function CampaignsClient({ initialCampaigns, accounts }: { initialCampaig
           <p className="text-muted-foreground">Envie mensagens em lote para seus contatos e leads.</p>
         </div>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-          <DialogTrigger asChild>
+          <DialogTrigger render={
             <Button>
               <Plus className="w-4 h-4 mr-2" />
               Nova Campanha
             </Button>
-          </DialogTrigger>
+          } />
           <DialogContent className="sm:max-w-[500px]">
             <form onSubmit={handleCreate}>
               <DialogHeader>
@@ -118,7 +118,7 @@ export function CampaignsClient({ initialCampaigns, accounts }: { initialCampaig
                 
                 <div className="grid gap-2">
                   <Label htmlFor="account">Conta Remetente</Label>
-                  <Select value={accountId} onValueChange={setAccountId} required>
+                  <Select value={accountId} onValueChange={(val) => val && setAccountId(val)} required>
                     <SelectTrigger id="account">
                       <SelectValue placeholder="Selecione a conta WhatsApp" />
                     </SelectTrigger>

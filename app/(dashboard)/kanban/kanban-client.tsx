@@ -134,11 +134,11 @@ export function KanbanClient({ initialStages, initialLeads }: { initialStages: a
                               {lead.title || `Oportunidade de ${lead.contact?.name}`}
                             </h4>
                             <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
+                              <DropdownMenuTrigger render={
                                 <Button variant="ghost" size="icon" className="h-6 w-6 -mt-1 -mr-1">
                                   <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
                                 </Button>
-                              </DropdownMenuTrigger>
+                              } />
                               <DropdownMenuContent align="end">
                                 <DropdownMenuItem>Editar</DropdownMenuItem>
                                 <DropdownMenuItem className="text-destructive">Excluir</DropdownMenuItem>

@@ -104,12 +104,12 @@ export function TemplatesClient({ initialTemplates }: { initialTemplates: any[] 
             Sincronizar Meta
           </Button>
           <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-            <DialogTrigger asChild>
+            <DialogTrigger render={
               <Button>
                 <Plus className="w-4 h-4 mr-2" />
                 Novo Template
               </Button>
-            </DialogTrigger>
+            } />
             <DialogContent className="sm:max-w-[500px]">
               <form onSubmit={handleCreate}>
                 <DialogHeader>
@@ -128,7 +128,7 @@ export function TemplatesClient({ initialTemplates }: { initialTemplates: any[] 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="grid gap-2">
                       <Label htmlFor="category">Categoria</Label>
-                      <Select value={category} onValueChange={setCategory}>
+                      <Select value={category} onValueChange={(val) => val && setCategory(val)}>
                         <SelectTrigger id="category">
                           <SelectValue placeholder="Selecione" />
                         </SelectTrigger>
@@ -141,7 +141,7 @@ export function TemplatesClient({ initialTemplates }: { initialTemplates: any[] 
                     </div>
                     <div className="grid gap-2">
                       <Label htmlFor="lang">Idioma</Label>
-                      <Select value={language} onValueChange={setLanguage}>
+                      <Select value={language} onValueChange={(val) => val && setLanguage(val)}>
                         <SelectTrigger id="lang">
                           <SelectValue placeholder="Selecione" />
                         </SelectTrigger>

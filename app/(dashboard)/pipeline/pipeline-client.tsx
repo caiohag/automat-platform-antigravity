@@ -76,12 +76,12 @@ export function PipelineClient({ initialStages }: { initialStages: any[] }) {
           <p className="text-muted-foreground">Configure as etapas de negociação para o seu CRM Kanban.</p>
         </div>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-          <DialogTrigger asChild>
+          <DialogTrigger render={
             <Button>
               <Plus className="w-4 h-4 mr-2" />
               Novo Estágio
             </Button>
-          </DialogTrigger>
+          } />
           <DialogContent className="sm:max-w-[425px]">
             <form onSubmit={handleCreate}>
               <DialogHeader>

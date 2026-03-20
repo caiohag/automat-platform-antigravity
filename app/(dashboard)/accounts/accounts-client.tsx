@@ -114,12 +114,12 @@ export function AccountsClient({ initialTenants }: { initialTenants: any[] }) {
           <p className="text-muted-foreground">Gerencie seus sub-tenants e clientes white-label.</p>
         </div>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-          <DialogTrigger asChild>
+          <DialogTrigger render={
             <Button>
               <Plus className="w-4 h-4 mr-2" />
               Novo Cliente
             </Button>
-          </DialogTrigger>
+          } />
           <DialogContent className="sm:max-w-[425px]">
             <form onSubmit={handleCreate}>
               <DialogHeader>

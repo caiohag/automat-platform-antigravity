@@ -105,12 +105,12 @@ export function WhatsappClient({ initialAccounts, agents }: { initialAccounts: a
           <p className="text-muted-foreground">Conecte e gerencie seus números para atendimento e automação.</p>
         </div>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-          <DialogTrigger asChild>
+          <DialogTrigger render={
             <Button>
               <Plus className="w-4 h-4 mr-2" />
               Conectar WhatsApp
             </Button>
-          </DialogTrigger>
+          } />
           <DialogContent className="sm:max-w-[450px]">
             <form onSubmit={handleCreate}>
               <DialogHeader>
@@ -127,7 +127,7 @@ export function WhatsappClient({ initialAccounts, agents }: { initialAccounts: a
                 
                 <div className="grid gap-2">
                   <Label htmlFor="type">Tipo de Conexão</Label>
-                  <Select value={connectionType} onValueChange={setConnectionType}>
+                  <Select value={connectionType} onValueChange={(val) => val && setConnectionType(val)}>
                     <SelectTrigger id="type">
                       <SelectValue placeholder="Selecione o tipo" />
                     </SelectTrigger>
@@ -140,7 +140,7 @@ export function WhatsappClient({ initialAccounts, agents }: { initialAccounts: a
 
                 <div className="grid gap-2">
                   <Label htmlFor="routing">Modo de Roteamento</Label>
-                  <Select value={routingMode} onValueChange={setRoutingMode}>
+                  <Select value={routingMode} onValueChange={(val) => val && setRoutingMode(val)}>
                     <SelectTrigger id="routing">
                       <SelectValue placeholder="Selecione o roteamento" />
                     </SelectTrigger>
@@ -156,7 +156,7 @@ export function WhatsappClient({ initialAccounts, agents }: { initialAccounts: a
                 {routingMode === 'ai_agent' || routingMode === 'hybrid' ? (
                   <div className="grid gap-2">
                     <Label htmlFor="agent">Agente IA Responsável</Label>
-                    <Select value={selectedAgent} onValueChange={setSelectedAgent}>
+                    <Select value={selectedAgent} onValueChange={(val) => val && setSelectedAgent(val)}>
                       <SelectTrigger id="agent">
                         <SelectValue placeholder="Selecione um agente" />
                       </SelectTrigger>

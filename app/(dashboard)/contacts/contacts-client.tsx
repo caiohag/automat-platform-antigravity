@@ -86,12 +86,12 @@ export function ContactsClient({ initialContacts }: { initialContacts: any[] }) 
             Exportar
           </Button>
           <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-            <DialogTrigger asChild>
+            <DialogTrigger render={
               <Button>
                 <Plus className="w-4 h-4 mr-2" />
                 Novo Contato
               </Button>
-            </DialogTrigger>
+            } />
             <DialogContent className="sm:max-w-[425px]">
               <form onSubmit={handleCreate}>
                 <DialogHeader>
@@ -192,11 +192,11 @@ export function ContactsClient({ initialContacts }: { initialContacts: any[] }) 
                   </TableCell>
                   <TableCell className="text-right">
                     <Sheet>
-                      <SheetTrigger asChild>
+                      <SheetTrigger render={
                         <Button variant="ghost" size="sm" onClick={() => setSelectedContact(contact)}>
                           Ver Detalhes
                         </Button>
-                      </SheetTrigger>
+                      } />
                       <SheetContent className="w-[400px] sm:w-[540px]">
                         <SheetHeader>
                           <SheetTitle>Detalhes do Contato</SheetTitle>
