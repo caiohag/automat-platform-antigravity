@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { Search, MoreVertical, Send, Paperclip, Phone, Bot, User, Filter, CheckCheck } from "lucide-react"
+import { Search, MoreVertical, Send, Paperclip, Phone, Bot, User, Filter, CheckCheck, MessageCircle } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
