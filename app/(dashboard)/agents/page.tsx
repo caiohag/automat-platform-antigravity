@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { Bot, Plus, ArrowRight } from "lucide-react"
@@ -16,10 +16,10 @@ export default async function AgentsPage() {
           <h1 className="text-3xl font-bold tracking-tight">Agentes IA</h1>
           <p className="text-muted-foreground">Gerencie os assistentes virtuais da sua plataforma.</p>
         </div>
-        <Link href="/agents/new" className={buttonVariants()}>
+        <Button render={<Link href="/agents/new" />}>
           <Plus className="w-4 h-4 mr-2" />
           Novo Agente
-        </Link>
+        </Button>
       </div>
 
       {!agents || agents.length === 0 ? (
@@ -31,9 +31,9 @@ export default async function AgentsPage() {
           <p className="text-muted-foreground mb-6 max-w-sm">
             Você ainda não criou nenhum agente IA para atendimento. Comece criando um agora mesmo.
           </p>
-          <Link href="/agents/new" className={buttonVariants()}>
+          <Button render={<Link href="/agents/new" />}>
             Criar meu primeiro agente
-          </Link>
+          </Button>
         </Card>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -57,10 +57,10 @@ export default async function AgentsPage() {
                 </div>
               </CardContent>
               <CardFooter className="pt-4 border-t">
-                <Link href={`/agents/${agent.id}`} className={buttonVariants({ variant: "ghost", className: "w-full justify-between" })}>
+                <Button variant="ghost" className="w-full justify-between" render={<Link href={`/agents/${agent.id}`} />}>
                   Configurar
                   <ArrowRight className="w-4 h-4" />
-                </Link>
+                </Button>
               </CardFooter>
             </Card>
           ))}

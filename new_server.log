@@ -1,0 +1,19 @@
+
+> automat-platform@0.1.0 start
+> next start -p 3010
+
+▲ Next.js 16.2.0
+- Local:         http://localhost:3010
+- Network:       http://192.168.0.27:3010
+✓ Ready in 88ms
+Dashboard count error: { message: '' }
+Dashboard count error: { message: '' }
+Dashboard count error: { message: '' }
+Dashboard count error: { message: '' }
+Dashboard count error: { message: '' }
+Dashboard count error: { message: '' }
+⨯ Error: Attempted to call buttonVariants() from the server but buttonVariants is on the client. It's not possible to invoke a client function from the server, it can only be rendered as a Component or passed to props of a Client Component.
+    at <unknown> (.next/server/chunks/ssr/_0h~uexn._.js:1:1274)
+    at o (.next/server/chunks/ssr/[root-of-the-server]__0b_1kbo._.js:1:5247) {
+  digest: '3352307806'
+}

@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Users, Bot, MessageSquare, Plus, Smartphone, Megaphone, Target } from "lucide-react"
 
@@ -98,13 +98,13 @@ export default async function DashboardPage() {
             <CardTitle>Ações Rápidas</CardTitle>
           </CardHeader>
           <CardContent className="flex gap-4">
-            <Link href="/agents/new" className={buttonVariants()}>
+            <Button render={<Link href="/agents/new" />}>
               <Plus className="w-4 h-4 mr-2" />
               Criar novo agente
-            </Link>
-            <Link href="/campaigns/new" className={buttonVariants({ variant: "outline" })}>
+            </Button>
+            <Button variant="outline" render={<Link href="/campaigns/new" />}>
               Nova campanha
-            </Link>
+            </Button>
           </CardContent>
         </Card>
       </div>
