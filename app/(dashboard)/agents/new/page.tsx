@@ -550,14 +550,27 @@ export default function NewAgentPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { toast.error('Sessão expirada. Faça login novamente.'); return }
 
-      // Get tenant
-      const { data: tenant } = await supabase
+      // Get or create tenant
+      let { data: tenant } = await supabase
         .from('tenants')
         .select('id')
         .eq('owner_id', user.id)
         .single()
 
-      if (!tenant) { toast.error('Tenant não encontrado.'); return }
+      if (!tenant) {
+        const slug = user.email?.split('@')[0]?.toLowerCase().replace(/[^a-z0-9]/g, '-') ?? `user-${Date.now()}`
+        const { data: newTenant, error: tenantError } = await supabase
+          .from('tenants')
+          .insert({ name: data.businessName || 'Minha Empresa', slug, owner_id: user.id })
+          .select('id')
+          .single()
+        if (tenantError || !newTenant) {
+          console.error('Erro ao criar tenant:', tenantError)
+          toast.error('Erro ao inicializar conta. Tente novamente.')
+          return
+        }
+        tenant = newTenant
+      }
 
       const { data: agent, error } = await supabase.from('agents').insert({
         tenant_id: tenant.id,
