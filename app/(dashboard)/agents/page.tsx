@@ -1,69 +1,121 @@
-import { createClient } from "@/lib/supabase/server"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import Link from "next/link"
-import { Bot, Plus, ArrowRight } from "lucide-react"
+import Link from 'next/link'
+import { Bot, PencilLine, Plus } from 'lucide-react'
+
+import { AgentStatusToggle } from '@/components/agent-status-toggle'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { createClient } from '@/lib/supabase/server'
+
+type AgentListItem = {
+  id: string
+  name: string | null
+  business_type: string | null
+  model: string | null
+  is_active: boolean | null
+  created_at: string | null
+}
 
 export default async function AgentsPage() {
   const supabase = await createClient()
-  const { data: agents } = await supabase.from('agents').select('*').order('created_at', { ascending: false })
+
+  let agents: AgentListItem[] = []
+
+  try {
+    const { data, error } = await supabase
+      .from('agents')
+      .select('id, name, business_type, model, is_active, created_at')
+      .order('created_at', { ascending: false })
+
+    if (!error) {
+      agents = (data ?? []) as AgentListItem[]
+    }
+  } catch {
+    agents = []
+  }
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Agentes IA</h1>
-          <p className="text-muted-foreground">Gerencie os assistentes virtuais da sua plataforma.</p>
+          <p className="text-muted-foreground">Gerencie seus agentes e status de operação.</p>
         </div>
+
         <Button render={<Link href="/agents/new" />}>
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="mr-2 h-4 w-4" />
           Novo Agente
         </Button>
       </div>
 
-      {!agents || agents.length === 0 ? (
-        <Card className="flex flex-col items-center justify-center p-12 text-center border-dashed">
-          <div className="bg-primary/10 p-4 rounded-full mb-4">
-            <Bot className="w-8 h-8 text-primary" />
-          </div>
-          <h2 className="text-xl font-semibold mb-2">Nenhum agente encontrado</h2>
-          <p className="text-muted-foreground mb-6 max-w-sm">
-            Você ainda não criou nenhum agente IA para atendimento. Comece criando um agora mesmo.
-          </p>
-          <Button render={<Link href="/agents/new" />}>
-            Criar meu primeiro agente
-          </Button>
+      {agents.length === 0 ? (
+        <Card className="border-dashed">
+          <CardHeader className="items-center text-center">
+            <div className="rounded-full bg-primary/10 p-3">
+              <Bot className="h-6 w-6 text-primary" />
+            </div>
+            <CardTitle>Nenhum agente criado ainda</CardTitle>
+            <CardDescription>
+              Crie seu primeiro agente para começar os testes e ativações.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex justify-center">
+            <Button render={<Link href="/agents/new" />}>Criar agente</Button>
+          </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {agents.map((agent) => (
-            <Card key={agent.id} className="flex flex-col">
-              <CardHeader>
-                <div className="flex justify-between items-start mb-2">
-                  <div className="p-2 bg-secondary rounded-md">
-                    <Bot className="w-5 h-5 text-secondary-foreground" />
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {agents.map((agent) => {
+            const createdAt = agent.created_at
+              ? new Date(agent.created_at).toLocaleDateString('pt-BR')
+              : '—'
+
+            return (
+              <Card key={agent.id}>
+                <CardHeader className="space-y-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <CardTitle className="text-lg">{agent.name || 'Agente sem nome'}</CardTitle>
+                      <CardDescription>{agent.business_type || 'Tipo não informado'}</CardDescription>
+                    </div>
+                    <Badge variant={agent.is_active ? 'default' : 'secondary'}>
+                      {agent.is_active ? 'Ativo' : 'Inativo'}
+                    </Badge>
                   </div>
-                  <Badge variant={agent.is_active ? 'default' : 'secondary'}>
-                    {agent.is_active ? 'Ativo' : 'Inativo'}
-                  </Badge>
-                </div>
-                <CardTitle className="text-xl">{agent.name}</CardTitle>
-                <CardDescription className="line-clamp-2">{agent.description || "Sem descrição"}</CardDescription>
-              </CardHeader>
-              <CardContent className="flex-1">
-                <div className="text-sm text-muted-foreground">
-                  Provedor: <span className="font-medium text-foreground">{agent.provider || "OpenAI"}</span>
-                </div>
-              </CardContent>
-              <CardFooter className="pt-4 border-t">
-                <Button variant="ghost" className="w-full justify-between" render={<Link href={`/agents/${agent.id}`} />}>
-                  Configurar
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
+
+                  <div className="rounded-md border p-2">
+                    <AgentStatusToggle
+                      agentId={agent.id}
+                      initialActive={Boolean(agent.is_active)}
+                    />
+                  </div>
+                </CardHeader>
+
+                <CardContent className="space-y-1 text-sm text-muted-foreground">
+                  <p>
+                    Modelo: <span className="font-medium text-foreground">{agent.model || 'gpt-4o'}</span>
+                  </p>
+                  <p>
+                    Criado em: <span className="font-medium text-foreground">{createdAt}</span>
+                  </p>
+                </CardContent>
+
+                <CardFooter>
+                  <Button variant="outline" className="w-full" render={<Link href={`/agents/${agent.id}`} />}>
+                    <PencilLine className="mr-2 h-4 w-4" />
+                    Editar
+                  </Button>
+                </CardFooter>
+              </Card>
+            )
+          })}
         </div>
       )}
     </div>
