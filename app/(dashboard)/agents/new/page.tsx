@@ -550,30 +550,54 @@ export default function NewAgentPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { toast.error('Sessão expirada. Faça login novamente.'); return }
 
-      // Get or create tenant
-      let { data: tenant } = await supabase
+      // Get existing tenant — use maybeSingle() to get null instead of error when no rows
+      const { data: existingTenant, error: selectError } = await supabase
         .from('tenants')
         .select('id')
         .eq('owner_id', user.id)
-        .single()
+        .maybeSingle()
 
-      if (!tenant) {
+      if (selectError) {
+        console.error('Erro ao buscar tenant:', selectError)
+      }
+
+      let tenantId = existingTenant?.id
+
+      if (!tenantId) {
+        // No tenant yet — create one
         const slug = user.email?.split('@')[0]?.toLowerCase().replace(/[^a-z0-9]/g, '-') ?? `user-${Date.now()}`
         const { data: newTenant, error: tenantError } = await supabase
           .from('tenants')
           .insert({ name: data.businessName || 'Minha Empresa', slug, owner_id: user.id })
           .select('id')
           .single()
+
         if (tenantError || !newTenant) {
           console.error('Erro ao criar tenant:', tenantError)
-          toast.error('Erro ao inicializar conta. Tente novamente.')
+          // If RLS blocks the insert, instruct the user
+          if (tenantError?.code === '42501' || tenantError?.message?.includes('policy')) {
+            toast.error('Permissão negada ao criar tenant. Verifique as políticas RLS no Supabase.')
+          } else {
+            toast.error(`Erro ao inicializar conta: ${tenantError?.message || 'Tente novamente.'}`)
+          }
           return
         }
-        tenant = newTenant
+        tenantId = newTenant.id
+
+        // Also create team_member row so other RLS policies work
+        await supabase.from('team_members').insert({
+          tenant_id: tenantId,
+          user_id: user.id,
+          email: user.email,
+          name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Admin',
+          role: 'admin',
+          status: 'active',
+          is_active: true,
+        })
       }
 
       const { data: agent, error } = await supabase.from('agents').insert({
-        tenant_id: tenant.id,
+        tenant_id: tenantId,
         name: data.agentName,
         description: data.businessDescription,
         system_prompt: generateSystemPrompt(data),
@@ -592,7 +616,7 @@ export default function NewAgentPage() {
 
       if (error) {
         console.error('Erro ao criar agente:', error)
-        toast.error('Erro ao criar agente. Tente novamente.')
+        toast.error(`Erro ao criar agente: ${error.message}`)
         return
       }
 
