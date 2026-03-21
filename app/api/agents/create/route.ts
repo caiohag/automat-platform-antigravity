@@ -1,15 +1,33 @@
 import { createClient } from '@supabase/supabase-js'
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient as createServerClient } from '@/lib/supabase/server'
 
 // This route uses the service role key to bypass RLS for initial tenant/agent creation
 export async function POST(request: NextRequest) {
   try {
-    // 1. Verify the user is authenticated via their session
-    const supabaseUser = await createServerClient()
+    // 1. Verify the user is authenticated via their session cookies
+    const cookieStore = await cookies()
+    const supabaseUser = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return cookieStore.getAll() },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              )
+            } catch { /* ignore in route handler */ }
+          },
+        },
+      }
+    )
+
     const { data: { user }, error: authError } = await supabaseUser.auth.getUser()
     if (authError || !user) {
-      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
+      return NextResponse.json({ error: 'Não autenticado. Faça login novamente.' }, { status: 401 })
     }
 
     // 2. Parse request body
@@ -17,7 +35,7 @@ export async function POST(request: NextRequest) {
     const { agentName, businessName, businessDescription, systemPrompt, knowledgeBase } = body
 
     if (!agentName || !systemPrompt) {
-      return NextResponse.json({ error: 'Campos obrigatórios não preenchidos' }, { status: 400 })
+      return NextResponse.json({ error: 'Campos obrigatórios não preenchidos (nome do agente e system prompt).' }, { status: 400 })
     }
 
     // 3. Create admin client that bypasses RLS
@@ -27,26 +45,30 @@ export async function POST(request: NextRequest) {
     )
 
     // 4. Check if user already has a tenant
-    const { data: existingTenant } = await supabaseAdmin
+    const { data: existingTenant, error: tenantSelectErr } = await supabaseAdmin
       .from('tenants')
       .select('id')
       .eq('owner_id', user.id)
       .maybeSingle()
 
+    if (tenantSelectErr) {
+      console.error('[API] Error selecting tenant:', tenantSelectErr)
+    }
+
     let tenantId = existingTenant?.id
 
     // 5. If no tenant, create one
     if (!tenantId) {
-      const slug = user.email?.split('@')[0]?.toLowerCase().replace(/[^a-z0-9]/g, '-') ?? `user-${Date.now()}`
+      const baseSlug = user.email?.split('@')[0]?.toLowerCase().replace(/[^a-z0-9]/g, '-') ?? 'user'
       
       // Check if slug already exists and make it unique if needed
       const { data: slugCheck } = await supabaseAdmin
         .from('tenants')
         .select('id')
-        .eq('slug', slug)
+        .eq('slug', baseSlug)
         .maybeSingle()
       
-      const finalSlug = slugCheck ? `${slug}-${Date.now()}` : slug
+      const finalSlug = slugCheck ? `${baseSlug}-${Date.now()}` : baseSlug
 
       const { data: newTenant, error: tenantError } = await supabaseAdmin
         .from('tenants')
@@ -59,8 +81,8 @@ export async function POST(request: NextRequest) {
         .single()
 
       if (tenantError || !newTenant) {
-        console.error('Tenant creation error:', tenantError)
-        return NextResponse.json({ error: `Erro ao criar tenant: ${tenantError?.message}` }, { status: 500 })
+        console.error('[API] Tenant creation error:', JSON.stringify(tenantError))
+        return NextResponse.json({ error: `Erro ao criar tenant: ${tenantError?.message || 'Desconhecido'}` }, { status: 500 })
       }
 
       tenantId = newTenant.id
@@ -77,7 +99,7 @@ export async function POST(request: NextRequest) {
       })
 
       if (memberError) {
-        console.error('Team member creation error:', memberError)
+        console.error('[API] Team member creation error:', JSON.stringify(memberError))
         // Non-blocking — continue to create agent
       }
     }
@@ -96,13 +118,13 @@ export async function POST(request: NextRequest) {
     }).select('id').single()
 
     if (agentError || !agent) {
-      console.error('Agent creation error:', agentError)
-      return NextResponse.json({ error: `Erro ao criar agente: ${agentError?.message}` }, { status: 500 })
+      console.error('[API] Agent creation error:', JSON.stringify(agentError))
+      return NextResponse.json({ error: `Erro ao criar agente: ${agentError?.message || 'Desconhecido'}` }, { status: 500 })
     }
 
     return NextResponse.json({ agentId: agent.id, tenantId }, { status: 201 })
   } catch (err: any) {
-    console.error('Unexpected error in agent creation:', err)
-    return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
+    console.error('[API] Unexpected error:', err?.message || err)
+    return NextResponse.json({ error: `Erro interno: ${err?.message || 'Verifique os logs do servidor'}` }, { status: 500 })
   }
 }
