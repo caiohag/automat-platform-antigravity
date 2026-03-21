@@ -573,7 +573,7 @@ export default function NewAgentPage() {
       }
 
       toast.success('Agente criado com sucesso!')
-      router.push(`/agents/${result.agentId}`)
+      router.push('/agents')
     } catch (err) {
       console.error(err)
       toast.error('Erro inesperado. Tente novamente.')
