@@ -31,5 +31,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/agents/:path*', '/chat/:path*', '/contacts/:path*', '/settings/:path*', '/whatsapp/:path*', '/kanban/:path*', '/campaigns/:path*'],
+  matcher: ['/dashboard/:path*', '/agents/:path*', '/chat/:path*', '/contacts/:path*', '/settings/:path*', '/whatsapp/:path*', '/kanban/:path*', '/campaigns/:path*', '/schedules/:path*', '/tasks/:path*', '/flows/:path*', '/team/:path*', '/subscription/:path*', '/white-label/:path*', '/help/:path*', '/remarketing/:path*', '/pipeline/:path*', '/accounts/:path*', '/templates/:path*'],
 }
